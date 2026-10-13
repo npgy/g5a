@@ -1,0 +1,7 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumLoadBalancerIPPool
+metadata:
+  name: "granola-ip-pool"
+spec:
+  blocks:
+    - cidr: "{{ env "CONTROL_PLANE_IP" }}/32"

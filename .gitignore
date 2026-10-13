@@ -1,0 +1,6 @@
+secrets/
+secrets.env
+talos-cluster/
+generated/
+flux-stuff/
+.DS_Store
