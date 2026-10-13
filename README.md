@@ -2,6 +2,11 @@
 
 *granola*
 
+## Setup this repo:
+
+Install go at https://go.dev/dl/  
+Install task: `go install github.com/go-task/task/v3/cmd/task@latest`
+
 ## Image Talos on your node(s)
 boot the machine in rescue mode.
 
