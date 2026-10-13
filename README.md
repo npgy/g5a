@@ -1,3 +1,8 @@
+# g5a
+
+*granola*
+
+## Image Talos on your node(s)
 boot the machine in rescue mode.
 
 generate image at factory.talos.dev
