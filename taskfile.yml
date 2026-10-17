@@ -25,4 +25,4 @@ tasks:
       - task: gen-secrets
       - task: gen-config
       - task: merge-config
-      - "cp static_files/.gitignore infra/cluster/.gitignore"
+      - "cp static_files/.gitignore infra/.gitignore"
