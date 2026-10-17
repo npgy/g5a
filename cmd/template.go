@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 	"text/template"
 )
 
@@ -14,6 +15,14 @@ func main() {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
+}
+
+func getEnv(key string) (string, error) {
+	v, exists := os.LookupEnv(key)
+	if !exists {
+		return "", fmt.Errorf("variable %q not set", key)
+	}
+	return v, nil
 }
 
 func run(args []string) error {
@@ -51,7 +60,8 @@ func run(args []string) error {
 		}
 
 		rendered, err := template.New(templatePath).Funcs(template.FuncMap{
-			"env": os.Getenv,
+			"env":   getEnv,
+			"lower": strings.ToLower,
 		}).Option("missingkey=error").Parse(string(data))
 		if err != nil {
 			return fmt.Errorf("parse template %q: %w", templatePath, err)

@@ -1,8 +1,10 @@
 version: '3'
 
-dotenv: ['data.env', 'secrets.env']
+dotenv: ['data.env', 'secrets.env', 'defaults.env']
 
 tasks:
-  dev:
+  build:
     cmds:
       - "go run ./cmd -i templates/ -o generated/"
+      # - "talosctl gen secrets --output-file secrets/talos-secrets.yaml"
+      # - "talosctl gen config --with-secrets secrets/talos-secrets.yaml $CLUSTER_NAME https://$CONTROL_PLANE_IP:6443 --config-patch-control-plane base/controlplane.yaml"

@@ -2,12 +2,12 @@ apiVersion: v1alpha1
 kind: UnattendedInstallConfig
 # The installer describes the source of the installation.
 installer:
-    image: factory.talos.dev/metal-installer/0749d3b51d8aa0567a5151b5df43a592c57a583b0e5e1b965e2fa098a01d98a9:v1.14.2 # Allows for supplying the image used to perform the installation.
+    image: {{ env "TALOS_IMAGE" }} # Allows for supplying the image used to perform the installation.
 # The provisioning describes how the installation disk should be provisioned.
 provisioning:
     # Matches disks to initialize as physical volumes.
     diskSelector:
-        match: disk.dev_path == "/dev/sda" # CEL expression matching a disk.
+        match: disk.dev_path == "{{ env "INSTALL_DISK" }}" # CEL expression matching a disk.
     wipe: true # Indicates if the installation disk should be wiped at installation time.
 ---
 apiVersion: v1alpha1
@@ -42,58 +42,60 @@ enabled: true # By default, CoreDNS deployment is enabled.
 apiVersion: v1alpha1
 kind: KubeExternalManifestConfig
 name: kubelet-serving-cert-approver
-url: https://raw.githubusercontent.com/alex1989hu/kubelet-serving-cert-approver/refs/tags/v0.12.1/deploy/standalone-install.yaml
+url: https://raw.githubusercontent.com/alex1989hu/kubelet-serving-cert-approver/refs/tags/{{ env "KUBELET_SERVING_CERT_APPROVER_VERSION" }}/deploy/standalone-install.yaml
 ---
 apiVersion: v1alpha1
 kind: KubeExternalManifestConfig
 name: metrics-server
-url: https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.9.0/components.yaml
+url: https://github.com/kubernetes-sigs/metrics-server/releases/download/{{ env "METRICS_SERVER_VERSION" }}/components.yaml
 ---
 apiVersion: v1alpha1
 kind: KubeExternalManifestConfig
 name: gateway-api-gatewayclass
-url: "https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.6.1/config/crd/standard/gateway.networking.k8s.io_gatewayclasses.yaml"
+url: "https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/{{ env "GATEWAY_API_VERSION" }}/config/crd/standard/gateway.networking.k8s.io_gatewayclasses.yaml"
 ---
 apiVersion: v1alpha1
 kind: KubeExternalManifestConfig
 name: gateway-api-gateway
-url: "https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.6.1/config/crd/standard/gateway.networking.k8s.io_gateways.yaml"
+url: "https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/{{ env "GATEWAY_API_VERSION" }}/config/crd/standard/gateway.networking.k8s.io_gateways.yaml"
 ---
 apiVersion: v1alpha1
 kind: KubeExternalManifestConfig
 name: gateway-api-httproute
-url: "https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.6.1/config/crd/standard/gateway.networking.k8s.io_httproutes.yaml"
+url: "https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/{{ env "GATEWAY_API_VERSION" }}/config/crd/standard/gateway.networking.k8s.io_httproutes.yaml"
 ---
 apiVersion: v1alpha1
 kind: KubeExternalManifestConfig
 name: gateway-api-grpcroute
-url: "https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.6.1/config/crd/standard/gateway.networking.k8s.io_grpcroutes.yaml"
+url: "https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/{{ env "GATEWAY_API_VERSION" }}/config/crd/standard/gateway.networking.k8s.io_grpcroutes.yaml"
 ---
 apiVersion: v1alpha1
 kind: KubeExternalManifestConfig
 name: gateway-api-backendtlspolicy
-url: "https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.6.1/config/crd/standard/gateway.networking.k8s.io_backendtlspolicies.yaml"
+url: "https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/{{ env "GATEWAY_API_VERSION" }}/config/crd/standard/gateway.networking.k8s.io_backendtlspolicies.yaml"
 ---
 apiVersion: v1alpha1
 kind: KubeExternalManifestConfig
 name: gateway-api-referencegrant
-url: "https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.6.1/config/crd/standard/gateway.networking.k8s.io_referencegrants.yaml"
+url: "https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/{{ env "GATEWAY_API_VERSION" }}/config/crd/standard/gateway.networking.k8s.io_referencegrants.yaml"
 ---
 apiVersion: v1alpha1
 kind: KubeExternalManifestConfig
 name: gateway-api-tlsroute
-url: "https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.6.1/config/crd/standard/gateway.networking.k8s.io_tlsroutes.yaml"
+url: "https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/{{ env "GATEWAY_API_VERSION" }}/config/crd/standard/gateway.networking.k8s.io_tlsroutes.yaml"
 ---
 apiVersion: v1alpha1
 kind: KubeExternalManifestConfig
 name: gateway-api-tcproute
-url: "https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v1.6.1/config/crd/standard/gateway.networking.k8s.io_tcproutes.yaml"
+url: "https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/{{ env "GATEWAY_API_VERSION" }}/config/crd/standard/gateway.networking.k8s.io_tcproutes.yaml"
+{{ if eq (env "TALOS_BASIC_STORAGE" | lower) "true" -}}
 ---
 apiVersion: v1alpha1
 kind: UserVolumeConfig
-name: local-path-provisioner
+name: user-storage
 provisioning:
   diskSelector:
     match: "!system_disk"
-  minSize: 200GB
-  maxSize: 200GB
+  minSize: {{ env "TALOS_BASIC_STORAGE_SIZE" }}
+  maxSize: {{ env "TALOS_BASIC_STORAGE_SIZE" }}
+{{ end }}
