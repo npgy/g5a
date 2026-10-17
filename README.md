@@ -7,6 +7,8 @@
 Install go at https://go.dev/dl/  
 Install task: `go install github.com/go-task/task/v3/cmd/task@latest`
 
+Copy `data.env.example` to `data.env` and set your variables
+
 ## Image Talos on your node(s)
 boot the machine in rescue mode.
 
@@ -27,22 +29,16 @@ run `wipefs --all /dev/sdX` for necessary disks to uninitialize them
 set server to boot from hd (disable rescue mode)
 `reboot`
 
-## Bootstrap talos
+## Build the Cluster
 
-`talosctl gen secrets --output-file secrets/talos-secrets.yaml`
+`task build`
 
-`talosctl gen config --with-secrets secrets/talos-secrets.yaml granola https://$CONTROL_PLANE_IP:6443 --config-patch-control-plane base/controlplane.yaml`
+This will output a folder called `infra`, which can be safely initialized as a git repo and commited to your own cluster repo.  
+You may still want this repo private, as the CONTROL_PLANE_IP is in the rendered assets, however all the certs and secrets will be gitignored.  
 
-`talosctl gen config granola https://$CONTROL_PLANE_IP:6443 --install-disk /dev/sda`
-
-move `talosconfig` into `~/.talos/config`
-
-`talosctl apply-config --insecure --nodes $CONTROL_PLANE_IP --file talos-cluster/controlplane.yaml`
-
-`talosctl config endpoints $CONTROL_PLANE_IP`
+`talosctl apply-config --insecure --nodes $CONTROL_PLANE_IP --file infra/cluster/.clusterconfig/controlplane.yaml`
 
 `talosctl bootstrap --nodes $CONTROL_PLANE_IP`
-
 
 `talosctl kubeconfig --nodes $CONTROL_PLANE_IP`
 
