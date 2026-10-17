@@ -5,14 +5,14 @@ dotenv: ['data.env', 'secrets.env', 'defaults.env']
 tasks:
   gen-secrets:
     cmds:
-      - "talosctl gen secrets --output-file cluster/secrets/talos-secrets.yaml --force"
+      - "talosctl gen secrets --output-file infra/cluster/secrets/talos-secrets.yaml --force"
   gen-config:
     cmds:
-      - "talosctl gen config --with-secrets cluster/secrets/talos-secrets.yaml $CLUSTER_NAME https://$CONTROL_PLANE_IP:6443 --config-patch-control-plane cluster/base/controlplane.yaml -o cluster/.clusterconfig --force"
-      - "talosctl --talosconfig=cluster/.clusterconfig/talosconfig config endpoints $CONTROL_PLANE_IP"
+      - "talosctl gen config --with-secrets infra/cluster/secrets/talos-secrets.yaml $CLUSTER_NAME https://$CONTROL_PLANE_IP:6443 --config-patch-control-plane infra/cluster/base/controlplane.yaml -o infra/cluster/.clusterconfig --force"
+      - "talosctl --talosconfig=infra/cluster/.clusterconfig/talosconfig config endpoints $CONTROL_PLANE_IP"
   merge-config:
     cmds:
-      - "talosctl config merge cluster/.clusterconfig/talosconfig"
+      - "talosctl config merge infra/cluster/.clusterconfig/talosconfig"
   rotate-secrets:
     cmds:
       - task: gen-secrets
@@ -20,9 +20,9 @@ tasks:
       - task: merge-config
   build:
     cmds:
-      - "go run ./cmd -i templates/ -o cluster/base/"
-      - "mkdir -p cluster/secrets/"
+      - "go run ./cmd -i templates/ -o infra/cluster/base/"
+      - "mkdir -p infra/cluster/secrets/"
       - task: gen-secrets
       - task: gen-config
       - task: merge-config
-      - "cp static_files/.gitignore cluster/.gitignore"
+      - "cp static_files/.gitignore infra/cluster/.gitignore"
