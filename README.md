@@ -73,9 +73,3 @@ helm install \
     --set operator.replicas=1 \
     --set ingressController.loadbalancerMode=shared
 ```
-
-Set your CONTROL_PLANE_IP in data.env or secrets.env
-
-`task dev`
-
-In the generated folder will be a CiliumLoadBalancerIPPool that you should now apply to your cluster
