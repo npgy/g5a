@@ -2,6 +2,15 @@
 
 *granola*
 
+Opinionated cluster setup for a single bare-metal node
+- Talos
+- Gateway API
+- Metrics Server
+- Cilium (w/ kubeproxy replacement)
+- FluxCD, via Flux Operator
+- Cert Manager
+- SOPS
+
 ## Setup this repo:
 
 Install go at https://go.dev/dl/  
@@ -31,7 +40,7 @@ set server to boot from hd (disable rescue mode)
 
 ## Build the Cluster
 
-`task build`
+Run `task build` to build your cluster given the values in `data.env` using the `templates/`
 
 This will output a folder called `infra`, which can be safely initialized as a git repo and commited to your own cluster repo.  
 You may still want this repo private, as the CONTROL_PLANE_IP is in the rendered assets, however all the certs and secrets will be gitignored.  
