@@ -1,7 +1,6 @@
 secrets/
 secrets.env
 data.env
-talos-cluster/
-generated/
+cluster/
 flux-stuff/
 .DS_Store
