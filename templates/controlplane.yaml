@@ -17,10 +17,15 @@ nodeIP: {}
 # Configures the node labels for the machine.
 labels:
     node-role.kubernetes.io/control-plane: ""
-    # node.kubernetes.io/exclude-from-external-load-balancers: "" # this prevents cilium from sending lb traffic to our control plane node
-# Configures the node taints for the machine. Effect is optional.
-# taints:
-#     node-role.kubernetes.io/control-plane: NoSchedule
+{{- if eq (env "WORKLOADS_ON_CONTROLPLANE" | lower) "true" }}
+    node.kubernetes.io/exclude-from-external-load-balancers:
+        $patch: delete
+{{ end }}
+{{- if eq (env "WORKLOADS_ON_CONTROLPLANE" | lower) "true" -}}
+taints:
+  node-role.kubernetes.io/control-plane:
+    $patch: delete
+{{ end }}
 ---
 apiVersion: v1alpha1
 kind: KubeletConfig
