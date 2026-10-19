@@ -50,10 +50,9 @@ Run `task build` to build your cluster given the values in `data.env` using the 
 This will output a folder called `infra`, which can be safely initialized as a git repo and commited to your own cluster repo.  
 You may still want this repo private, as the CONTROL_PLANE_IP is in the rendered assets, however all the certs and secrets will be gitignored.  
 
-`task apply-config`
-
-`task bootstrap`
-
-`task kubeconfig`
-
-`task install-cilium`
+Now run `task bootstrap`  
+This will do the following:
+- Apply the config
+- Bootstrap k8s/etcd
+- Add the cluster to your local kubeconfig
+- Install Cilium
