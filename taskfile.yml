@@ -99,3 +99,19 @@ tasks:
       - echo "Waiting 10s for Talos API to become available..."
       - task: wait # needed because talos API becomes unavailable for a short period after applying an initial config
       - task: bootstrap-k8s-and-install-cilium
+  
+  # 2nd stage of bootstrap, Flux
+
+  install-flux-operator:
+    cmds:
+      - |
+        helm install flux-operator oci://ghcr.io/controlplaneio-fluxcd/charts/flux-operator \
+        --namespace flux-system \
+        --create-namespace
+  bootstrap-github:
+    cmds:
+      - |
+        flux create secret githubapp flux-system \
+        --app-id=$GITHUB_APP_ID \
+        --app-installation-id=$GITHUB_APP_INSTALLATION_ID \
+        --app-private-key=$GITHUB_APP_PRIVATE_KEY
