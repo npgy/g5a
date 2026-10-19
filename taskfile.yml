@@ -82,6 +82,7 @@ tasks:
     cmds:
       - task: talos-bootstrap
       - task: kubeconfig
+      - echo "Waiting 30s for Kubernetes API to become available..."
       - task: wait # takes some time for the Kubernetes API to become available after bootstrapping
         vars:
             SECONDS: 30
@@ -89,10 +90,12 @@ tasks:
   init-bootstrap:
     cmds:
       - task: apply-config-insecure
-      - task: wait # needed because talos api becomes unavailable for a short period after applying an initial config
+      - echo "Waiting 10s for Talos API to become available..."
+      - task: wait # needed because talos API becomes unavailable for a short period after applying an initial config
       - task: bootstrap-k8s-and-install-cilium
   bootstrap:
     cmds:
       - task: apply-config
-      - task: wait # needed because talos api becomes unavailable for a short period after applying an initial config
+      - echo "Waiting 10s for Talos API to become available..."
+      - task: wait # needed because talos API becomes unavailable for a short period after applying an initial config
       - task: bootstrap-k8s-and-install-cilium
