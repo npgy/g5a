@@ -77,7 +77,7 @@ tasks:
         --set gatewayAPI.enabled=true \
         --set gatewayAPI.enableAlpn=true \
         --set gatewayAPI.enableAppProtocol=true
-  bootstrap-and-install-cilium:
+  bootstrap-k8s-and-install-cilium:
     internal: true
     cmds:
       - task: talos-bootstrap
@@ -90,9 +90,9 @@ tasks:
     cmds:
       - task: apply-config-insecure
       - task: wait # needed because talos api becomes unavailable for a short period after applying an initial config
-      - task: bootstrap-and-install-cilium
+      - task: bootstrap-k8s-and-install-cilium
   bootstrap:
     cmds:
       - task: apply-config
       - task: wait # needed because talos api becomes unavailable for a short period after applying an initial config
-      - task: bootstrap-and-install-cilium
+      - task: bootstrap-k8s-and-install-cilium
