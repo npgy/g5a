@@ -1,6 +1,6 @@
 version: '3'
 
-dotenv: ['data.env', 'secrets.env', 'defaults.env']
+dotenv: ['settings.env', 'secrets.env', 'defaults.env']
 
 tasks:
   # shared utils

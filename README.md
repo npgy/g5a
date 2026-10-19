@@ -21,7 +21,7 @@ Install Helm: https://helm.sh/docs/intro/install/
 **The following are optional but highly recommended:**  
 Install kubectl: https://kubernetes.io/docs/tasks/tools/  
 
-Copy `data.env.example` to `data.env` and set your variables
+Copy `settings.env.example` to `settings.env` and set your variables
 
 ## Image Talos on your node(s)
 boot the machine in rescue mode.
@@ -45,7 +45,7 @@ set server to boot from hd (disable rescue mode)
 
 ## Build the Cluster
 
-Run `task build` to build your cluster given the values in `data.env` using the `templates/`
+Run `task build` to build your cluster given the values in `settings.env` using the `templates/`
 
 This will output a folder called `infra`, which can be safely initialized as a git repo and commited to your own cluster repo.  
 You may still want this repo private, as the CONTROL_PLANE_IP is in the rendered assets, however all the certs and secrets will be gitignored.  

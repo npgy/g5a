@@ -1,6 +1,6 @@
 secrets/
 secrets.env
-data.env
+settings.env
 infra/
 flux-stuff/
 .DS_Store
