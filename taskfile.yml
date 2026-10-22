@@ -11,7 +11,7 @@ tasks:
       - "talosctl dashboard --nodes $CONTROL_PLANE_IP"
   gen-templates:
     cmds:
-      - "go run ./cmd -i templates/ -o infra/cluster/base/"
+      - "go run ./cmd/template -i templates/ -o infra/cluster/base/"
   gen-secrets:
     cmds:
       - "talosctl gen secrets --output-file infra/cluster/secrets/talos-secrets.yaml --force"
