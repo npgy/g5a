@@ -23,6 +23,15 @@ Install kubectl: https://kubernetes.io/docs/tasks/tools/
 
 Copy `settings.env.example` to `settings.env` and set your variables
 
+## Retry a command
+
+Run a shell command and retry it after failures. `-n` is the number of retries after
+the initial attempt, and `-wait` is the delay between retries:
+
+```sh
+go run ./cmd/retry -n 3 -wait 5s -- 'kubectl get nodes'
+```
+
 ## Image Talos on your node(s)
 boot the machine in rescue mode.
 

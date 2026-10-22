@@ -3,17 +3,6 @@ version: '3'
 dotenv: ['settings.env', 'secrets.env', 'defaults.env']
 
 tasks:
-  # shared utils
-  wait:
-    internal: true
-    vars:
-      SECONDS: 10
-    cmds:
-      - cmd: timeout /t {{.SECONDS}} /nobreak
-        platforms: [windows]
-      - cmd: sleep {{.SECONDS}}
-        platforms: [linux, darwin]
-
   get-disks:
     cmds:
       - "talosctl get disks --insecure --nodes $CONTROL_PLANE_IP"
@@ -54,14 +43,14 @@ tasks:
       - "talosctl apply-config --nodes $CONTROL_PLANE_IP --file infra/cluster/.clusterconfig/controlplane.yaml"
   talos-bootstrap:
     cmds:
-      - "talosctl bootstrap --nodes $CONTROL_PLANE_IP"
+      - "go run ./cmd/retry -n 2 -wait 8s -- 'talosctl bootstrap --nodes $CONTROL_PLANE_IP'"
   kubeconfig:
     cmds:
       - "talosctl kubeconfig --nodes $CONTROL_PLANE_IP"
   install-cilium:
     cmds:
       - |
-        helm install \
+        go run ./cmd/retry -n 5 -wait 8s -- 'helm install \
         cilium \
         cilium/cilium \
         --version $CILIUM_VERSION \
@@ -76,28 +65,20 @@ tasks:
         --set k8sServicePort=7445 \
         --set gatewayAPI.enabled=true \
         --set gatewayAPI.enableAlpn=true \
-        --set gatewayAPI.enableAppProtocol=true
+        --set gatewayAPI.enableAppProtocol=true'
   bootstrap-k8s-and-install-cilium:
     internal: true
     cmds:
       - task: talos-bootstrap
       - task: kubeconfig
-      - echo "Waiting 30s for Kubernetes API to become available..."
-      - task: wait # takes some time for the Kubernetes API to become available after bootstrapping
-        vars:
-            SECONDS: 30
       - task: install-cilium
   init-bootstrap:
     cmds:
       - task: apply-config-insecure
-      - echo "Waiting 10s for Talos API to become available..."
-      - task: wait # needed because talos API becomes unavailable for a short period after applying an initial config
       - task: bootstrap-k8s-and-install-cilium
   bootstrap:
     cmds:
       - task: apply-config
-      - echo "Waiting 10s for Talos API to become available..."
-      - task: wait # needed because talos API becomes unavailable for a short period after applying an initial config
       - task: bootstrap-k8s-and-install-cilium
   
   # 2nd stage of bootstrap, Flux
