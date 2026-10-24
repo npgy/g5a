@@ -43,14 +43,14 @@ tasks:
       - "talosctl apply-config --nodes $CONTROL_PLANE_IP --file infra/cluster/.clusterconfig/controlplane.yaml"
   talos-bootstrap:
     cmds:
-      - "go run ./cmd/retry -n 2 -wait 8s -- 'talosctl bootstrap --nodes $CONTROL_PLANE_IP'"
+      - "go run ./cmd/retry -n 2 -wait 10s -- 'talosctl bootstrap --nodes $CONTROL_PLANE_IP'"
   kubeconfig:
     cmds:
       - "talosctl kubeconfig --nodes $CONTROL_PLANE_IP"
   install-cilium:
     cmds:
       - |
-        go run ./cmd/retry -n 5 -wait 8s -- 'helm install \
+        go run ./cmd/retry -n 4 -wait 13s -- 'helm install \
         cilium \
         cilium/cilium \
         --version $CILIUM_VERSION \
@@ -95,10 +95,10 @@ tasks:
   bootstrap-github:
     cmds:
       - |
-        flux create secret githubapp $GITHUB_APP_SECRET \
+        go run ./cmd/retry -n 2 -wait 2s -- 'flux create secret githubapp $GITHUB_APP_SECRET \
         --app-id=$GITHUB_APP_ID \
         --app-installation-id=$GITHUB_APP_INSTALLATION_ID \
-        --app-private-key=$GITHUB_APP_PRIVATE_KEY
+        --app-private-key=$GITHUB_APP_PRIVATE_KEY'
   apply-flux:
     cmds:
       - cmd: mkdir -p infra/flux/clusters/$CLUSTER_NAME
