@@ -1,6 +1,6 @@
 version: '3'
 
-dotenv: ['settings.env', 'secrets.env', 'defaults.env']
+dotenv: ['settings.env', 'secrets.env', 'github_app_secrets.env', 'defaults.env']
 
 tasks:
   get-disks:
@@ -91,7 +91,7 @@ tasks:
         --create-namespace
   github-app:
     cmds:
-      - go run ./cmd/create_gh_app/main.go
+      - go run ./cmd/create_gh_app
   bootstrap-github:
     cmds:
       - |

@@ -5,16 +5,10 @@ import (
 	"encoding/base32"
 	"encoding/json"
 	"fmt"
-	"html"
 	"net/http"
 	"os"
-	"strings"
+	"time"
 )
-
-const HOST = "127.0.0.1"
-const DEFAULT_PORT = "3784"
-const CREATE_APP_PATH = "/create-app"
-const CALLBACK_PATH = "/callback"
 
 func main() {
 	if err := run(); err != nil {
@@ -23,21 +17,28 @@ func main() {
 	}
 }
 
-func run() error {
-	port := getEnv("PORT", DEFAULT_PORT)
-	appName, err := requireEnv("GITHUB_APP_NAME")
-	if err != nil {
-		return fmt.Errorf("failed to get GITHUB_APP_NAME: %w", err)
+func createStateSecret(size int) (string, error) {
+	bytes := make([]byte, size)
+	if _, err := rand.Read(bytes); err != nil {
+		return "", err
 	}
-	appUrl, err := requireEnv("GITHUB_APP_URL")
-	if err != nil {
-		return fmt.Errorf("failed to get GITHUB_APP_URL: %w", err)
-	}
-	githubOrg := strings.TrimSpace(os.Getenv("GITHUB_APP_ORGANIZATION"))
 
-	appPath := "/settings/apps/new"
-	if githubOrg != "" {
-		appPath = fmt.Sprintf("/organizations/%s%s", githubOrg, appPath)
+	return base32.StdEncoding.WithPadding(base32.NoPadding).EncodeToString(bytes), nil
+}
+
+func addHandler(httpMux *http.ServeMux, path string, handlerFunc HandlerFunc) {
+	httpMux.HandleFunc(path, func(w http.ResponseWriter, r *http.Request) {
+		if err := handlerFunc(w, r); err != nil {
+			fmt.Printf("handler error for path %s: %v\n", path, err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	})
+}
+
+func run() error {
+	config, err := setupConfig()
+	if err != nil {
+		return fmt.Errorf("setup config: %w", err)
 	}
 
 	stateSecret, err := createStateSecret(32)
@@ -45,70 +46,64 @@ func run() error {
 		return fmt.Errorf("failed to create state secret: %w", err)
 	}
 
+	httpClient := &http.Client{Timeout: 30 * time.Second}
+
 	httpMux := http.NewServeMux()
 
-	httpMux.HandleFunc(CREATE_APP_PATH, func(w http.ResponseWriter, r *http.Request) {
-		callbackUrl := fmt.Sprintf("http://%s:%s%s", HOST, port, CALLBACK_PATH)
+	addHandler(httpMux, CREATE_APP_PATH, func(w http.ResponseWriter, r *http.Request) error {
+		callbackUrl := fmt.Sprintf("http://%s:%s%s", HOST, config.Port, CALLBACK_PATH)
 
-		manifest := map[string]any{
-			"name":         appName,
-			"url":          appUrl,
+		manifest := Json{
+			"name":         config.AppName,
+			"url":          config.AppUrl,
 			"redirect_url": callbackUrl,
 			"public":       false,
-			"default_permissions": map[string]string{
+			"default_permissions": Json{
 				"metadata": "read",
 				"contents": "write",
 			},
 		}
 		manifestJson, err := json.Marshal(manifest)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
+			return fmt.Errorf("marshal manifest: %w", err)
 		}
 
-		page := fmt.Sprintf(
-			`<form id="create-app" action="https://github.com%s" method="post">`+
-				`<input type="hidden" name="manifest" value="%s">`+
-				`<input type="hidden" name="state" value="%s">`+
-				`</form><script>document.getElementById('create-app').submit()</script>`,
-			html.EscapeString(appPath),
-			html.EscapeString(string(manifestJson)),
-			html.EscapeString(stateSecret),
-		)
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write([]byte(page))
+		_, _ = w.Write(createFormPage(config.AppPath, manifestJson, stateSecret))
+
+		return nil
 	})
 
-	httpMux.HandleFunc(CALLBACK_PATH, func(w http.ResponseWriter, r *http.Request) {
-		query := r.URL.Query()
-		fmt.Printf("received data %s\n", query)
-		w.Write([]byte("Hello, GitHub App!"))
+	addHandler(httpMux, CALLBACK_PATH, func(w http.ResponseWriter, r *http.Request) error {
+		code := r.URL.Query().Get("code")
+		if code == "" {
+			return fmt.Errorf("missing GitHub manifest code")
+		}
+
+		app, err := createGitHubAppFromManifest(code, httpClient)
+		if err != nil {
+			return fmt.Errorf("create GitHub App from manifest: %w", err)
+		}
+
+		if err := savePrivateKey(config.PrivateKeyPath, app.Pem); err != nil {
+			return fmt.Errorf("save private key: %w", err)
+		}
+
+		if err := writeGitHubSecrets(app.Id, "github_app_secrets.env"); err != nil {
+			return fmt.Errorf("write GitHub secrets: %w", err)
+		}
+
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		w.WriteHeader(http.StatusOK)
+
+		if _, err := w.Write(successPage(config.PrivateKeyPath)); err != nil {
+			fmt.Fprintf(os.Stderr, "write callback response: %v\n", err)
+		}
+
+		return nil
 	})
 
-	http.ListenAndServe(fmt.Sprintf(":%s", port), httpMux)
+	http.ListenAndServe(fmt.Sprintf(":%s", config.Port), httpMux)
 	return nil
-}
-
-func createStateSecret(size int) (string, error) {
-	bytes := make([]byte, size)
-	if _, err := rand.Read(bytes); err != nil {
-		return "", err
-	}
-	// Use NoPadding if you want to omit trailing '=' characters
-	return base32.StdEncoding.WithPadding(base32.NoPadding).EncodeToString(bytes), nil
-}
-
-func getEnv(key, fallback string) string {
-	if value, ok := os.LookupEnv(key); ok {
-		return strings.TrimSpace(value)
-	}
-	return fallback
-}
-
-func requireEnv(key string) (string, error) {
-	if value, ok := os.LookupEnv(key); ok {
-		return strings.TrimSpace(value), nil
-	}
-	return "", fmt.Errorf("required environment variable %s not set", key)
 }
