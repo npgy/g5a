@@ -60,8 +60,9 @@ func run(args []string) error {
 		}
 
 		rendered, err := template.New(templatePath).Funcs(template.FuncMap{
-			"env":   getEnv,
-			"lower": strings.ToLower,
+			"env":        getEnv,
+			"lower":      strings.ToLower,
+			"trimSuffix": strings.TrimSuffix,
 		}).Option("missingkey=error").Parse(string(data))
 		if err != nil {
 			return fmt.Errorf("parse template %q: %w", templatePath, err)

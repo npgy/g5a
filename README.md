@@ -17,20 +17,9 @@ Install go at https://go.dev/dl/
 Install task: `go install github.com/go-task/task/v3/cmd/task@latest`
 
 Install Helm: https://helm.sh/docs/intro/install/  
-
-**The following are optional but highly recommended:**  
 Install kubectl: https://kubernetes.io/docs/tasks/tools/  
 
 Copy `settings.env.example` to `settings.env` and set your variables
-
-## Retry a command
-
-Run a shell command and retry it after failures. `-n` is the number of retries after
-the initial attempt, and `-wait` is the delay between retries:
-
-```sh
-go run ./cmd/retry -n 3 -wait 5s -- 'kubectl get nodes'
-```
 
 ## Image Talos on your node(s)
 boot the machine in rescue mode.
@@ -65,3 +54,8 @@ This will do the following:
 - Bootstrap k8s/etcd
 - Add the cluster to your local kubeconfig
 - Install Cilium
+
+Finally, run `task connect-github`  
+This will open your browser to go through the flow of creating and authorizing a GitHub app on your user or organization.  
+Once complete, the cluster will be fully GitOps bootstrapped!  
+You can now apply any manifest simply by pushing to the `infra/flux/clusters/$CLUSTER_NAME` folder!

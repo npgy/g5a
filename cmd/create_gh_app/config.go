@@ -10,6 +10,7 @@ const HOST = "127.0.0.1"
 const DEFAULT_PORT = "3784"
 const CREATE_APP_PATH = "/create-app"
 const CALLBACK_PATH = "/callback"
+const INSTALLATION_CALLBACK_PATH = "/installation-callback"
 
 type Config struct {
 	Port           string
@@ -39,9 +40,9 @@ func setupConfig() (*Config, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to get GITHUB_APP_NAME: %w", err)
 	}
-	appUrl, err := requireEnv("GITHUB_APP_URL")
+	appUrl, err := requireEnv("INFRA_REPO_URL")
 	if err != nil {
-		return nil, fmt.Errorf("failed to get GITHUB_APP_URL: %w", err)
+		return nil, fmt.Errorf("failed to get INFRA_REPO_URL: %w", err)
 	}
 	githubOrg := strings.TrimSpace(os.Getenv("GITHUB_APP_ORGANIZATION"))
 

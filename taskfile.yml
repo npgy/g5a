@@ -72,11 +72,11 @@ tasks:
       - task: talos-bootstrap
       - task: kubeconfig
       - task: install-cilium
-  init-bootstrap:
+  bootstrap:
     cmds:
       - task: apply-config-insecure
       - task: bootstrap-k8s-and-install-cilium
-  bootstrap:
+  sec-bootstrap:
     cmds:
       - task: apply-config
       - task: bootstrap-k8s-and-install-cilium
@@ -89,13 +89,24 @@ tasks:
         helm install flux-operator oci://ghcr.io/controlplaneio-fluxcd/charts/flux-operator \
         --namespace flux-system \
         --create-namespace
-  github-app:
+  create-github-app:
     cmds:
       - go run ./cmd/create_gh_app
   bootstrap-github:
     cmds:
       - |
-        flux create secret githubapp flux-system \
+        flux create secret githubapp $GITHUB_APP_SECRET \
         --app-id=$GITHUB_APP_ID \
         --app-installation-id=$GITHUB_APP_INSTALLATION_ID \
         --app-private-key=$GITHUB_APP_PRIVATE_KEY
+  apply-flux:
+    cmds:
+      - cmd: mkdir -p infra/flux/clusters/$CLUSTER_NAME
+      - cmd: mv infra/cluster/base/flux-instance.yaml infra/flux/clusters/$CLUSTER_NAME/
+      - cmd: kubectl apply -f infra/flux/clusters/$CLUSTER_NAME/flux-instance.yaml
+  connect-github:
+    cmds:
+      - task: install-flux-operator
+      - task: create-github-app
+      - task: bootstrap-github
+      - task: apply-flux

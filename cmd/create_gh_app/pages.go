@@ -32,7 +32,7 @@ func successPage(privateKeyPath string) []byte {
 					style="display: flex; flex-direction: column; gap: 1em; background-color: #90c1cf; padding: 20px; border-radius: 8px; max-width: 600px">
 					<div>
 						<h1>GitHub App Created Successfully!</h1>
-						<p>The App ID is now available in your env, and the private key was saved to
+						<p>The App ID and installation ID are now available in your env, and the private key was saved to
 							<code style="font-size: 12pt; font-weight: bold">%s</code>.
 						</p>
 					</div>

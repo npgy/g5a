@@ -1,0 +1,28 @@
+apiVersion: fluxcd.controlplane.io/v1
+kind: FluxInstance
+metadata:
+  name: flux
+  namespace: flux-system
+spec:
+  distribution:
+    version: "2.x"
+    registry: "ghcr.io/fluxcd"
+  components:
+    - source-controller
+    - kustomize-controller
+    - helm-controller
+    - notification-controller
+    - image-reflector-controller
+    - image-automation-controller
+  cluster:
+    type: kubernetes
+    multitenant: false
+    networkPolicy: true
+    domain: "cluster.local"
+  sync:
+    kind: GitRepository
+    provider: github
+    url: "{{ trimSuffix (trimSuffix (env "INFRA_REPO_URL") ".git") "/" }}.git"
+    ref: "refs/heads/{{ env "INFRA_REPO_BRANCH" }}"
+    path: "flux/clusters/{{ env "CLUSTER_NAME" }}"
+    pullSecret: "{{ env "GITHUB_APP_SECRET" }}"

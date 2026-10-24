@@ -8,8 +8,9 @@ import (
 )
 
 type GithubApp struct {
-	Id  int64  `json:"id"`
-	Pem string `json:"pem"`
+	Id   int64  `json:"id"`
+	Pem  string `json:"pem"`
+	Slug string `json:"slug"`
 }
 
 func createGitHubAppFromManifest(code string, httpClient *http.Client) (*GithubApp, error) {
@@ -38,8 +39,8 @@ func createGitHubAppFromManifest(code string, httpClient *http.Client) (*GithubA
 	if err := json.NewDecoder(response.Body).Decode(&app); err != nil {
 		return nil, fmt.Errorf("decode manifest conversion response: %w", err)
 	}
-	if app.Id == 0 || app.Pem == "" {
-		return nil, fmt.Errorf("manifest conversion response did not include an App ID and private key")
+	if app.Id == 0 || app.Pem == "" || app.Slug == "" {
+		return nil, fmt.Errorf("manifest conversion response did not include an App ID, private key, and slug")
 	}
 	return &app, nil
 }

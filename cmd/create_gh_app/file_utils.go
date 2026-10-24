@@ -30,12 +30,16 @@ func savePrivateKey(privateKeyPath string, privateKey string) error {
 	return nil
 }
 
-func writeGitHubSecrets(appID int64, filePath string) error {
+func writeGitHubSecrets(appID int64, installationID int64, filePath string) error {
 	githubSecretsFile, err := os.Create(filePath)
 	if err != nil {
 		return fmt.Errorf("create GitHub secrets file: %w", err)
 	}
-	if _, err := githubSecretsFile.WriteString(fmt.Sprintf("GITHUB_APP_ID=%d\n", appID)); err != nil {
+	if _, err := githubSecretsFile.WriteString(fmt.Sprintf(
+		"GITHUB_APP_ID=%d\nGITHUB_APP_INSTALLATION_ID=%d\n",
+		appID,
+		installationID,
+	)); err != nil {
 		return fmt.Errorf("write GitHub secrets file: %w", err)
 	}
 	if err := githubSecretsFile.Close(); err != nil {
