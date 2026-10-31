@@ -49,10 +49,13 @@ tasks:
   kubeconfig:
     cmds:
       - "talosctl kubeconfig --nodes $CONTROL_PLANE_IP"
+  install-gateway-api:
+    cmds:
+      - "go run ./cmd/retry -n 4 -wait 13s -- 'kubectl apply --server-side -f https://github.com/kubernetes-sigs/gateway-api/releases/download/$GATEWAY_API_VERSION/standard-install.yaml'"
   install-cilium:
     cmds:
       - |
-        go run ./cmd/retry -n 4 -wait 13s -- 'helm install \
+        helm install \
         cilium \
         oci://quay.io/cilium/charts/cilium \
         --version $CILIUM_VERSION \
@@ -67,12 +70,13 @@ tasks:
         --set k8sServicePort=7445 \
         --set gatewayAPI.enabled=true \
         --set gatewayAPI.enableAlpn=true \
-        --set gatewayAPI.enableAppProtocol=true'
+        --set gatewayAPI.enableAppProtocol=true
   bootstrap-k8s-and-install-cilium:
     internal: true
     cmds:
       - task: talos-bootstrap
       - task: kubeconfig
+      - task: install-gateway-api
       - task: install-cilium
   bootstrap:
     cmds:

@@ -43,56 +43,6 @@ $patch: delete
 apiVersion: v1alpha1
 kind: KubeCoreDNSConfig
 enabled: true # By default, CoreDNS deployment is enabled.
----
-apiVersion: v1alpha1
-kind: KubeExternalManifestConfig
-name: kubelet-serving-cert-approver
-url: https://raw.githubusercontent.com/alex1989hu/kubelet-serving-cert-approver/refs/tags/{{ env "KUBELET_SERVING_CERT_APPROVER_VERSION" }}/deploy/standalone-install.yaml
----
-apiVersion: v1alpha1
-kind: KubeExternalManifestConfig
-name: metrics-server
-url: https://github.com/kubernetes-sigs/metrics-server/releases/download/{{ env "METRICS_SERVER_VERSION" }}/components.yaml
----
-apiVersion: v1alpha1
-kind: KubeExternalManifestConfig
-name: gateway-api-gatewayclass
-url: "https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/{{ env "GATEWAY_API_VERSION" }}/config/crd/standard/gateway.networking.k8s.io_gatewayclasses.yaml"
----
-apiVersion: v1alpha1
-kind: KubeExternalManifestConfig
-name: gateway-api-gateway
-url: "https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/{{ env "GATEWAY_API_VERSION" }}/config/crd/standard/gateway.networking.k8s.io_gateways.yaml"
----
-apiVersion: v1alpha1
-kind: KubeExternalManifestConfig
-name: gateway-api-httproute
-url: "https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/{{ env "GATEWAY_API_VERSION" }}/config/crd/standard/gateway.networking.k8s.io_httproutes.yaml"
----
-apiVersion: v1alpha1
-kind: KubeExternalManifestConfig
-name: gateway-api-grpcroute
-url: "https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/{{ env "GATEWAY_API_VERSION" }}/config/crd/standard/gateway.networking.k8s.io_grpcroutes.yaml"
----
-apiVersion: v1alpha1
-kind: KubeExternalManifestConfig
-name: gateway-api-backendtlspolicy
-url: "https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/{{ env "GATEWAY_API_VERSION" }}/config/crd/standard/gateway.networking.k8s.io_backendtlspolicies.yaml"
----
-apiVersion: v1alpha1
-kind: KubeExternalManifestConfig
-name: gateway-api-referencegrant
-url: "https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/{{ env "GATEWAY_API_VERSION" }}/config/crd/standard/gateway.networking.k8s.io_referencegrants.yaml"
----
-apiVersion: v1alpha1
-kind: KubeExternalManifestConfig
-name: gateway-api-tlsroute
-url: "https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/{{ env "GATEWAY_API_VERSION" }}/config/crd/standard/gateway.networking.k8s.io_tlsroutes.yaml"
----
-apiVersion: v1alpha1
-kind: KubeExternalManifestConfig
-name: gateway-api-tcproute
-url: "https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/{{ env "GATEWAY_API_VERSION" }}/config/crd/standard/gateway.networking.k8s.io_tcproutes.yaml"
 {{ if eq (env "TALOS_BASIC_STORAGE" | lower) "true" -}}
 ---
 apiVersion: v1alpha1
