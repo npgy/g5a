@@ -12,6 +12,8 @@ tasks:
   gen-templates:
     cmds:
       - "go run ./cmd/template -i templates/ -o infra/cluster/base/"
+      - "go run ./cmd/template -i templates/flux-base -o infra/flux/clusters/$CLUSTER_NAME/"
+      - "go run ./cmd/template -i templates/cluster-foundation -o infra/flux/cluster-foundation/"
   gen-secrets:
     cmds:
       - "talosctl gen secrets --output-file infra/cluster/secrets/talos-secrets.yaml --force"
@@ -52,7 +54,7 @@ tasks:
       - |
         go run ./cmd/retry -n 4 -wait 13s -- 'helm install \
         cilium \
-        cilium/cilium \
+        oci://quay.io/cilium/charts/cilium \
         --version $CILIUM_VERSION \
         --namespace kube-system \
         --set ipam.mode=kubernetes \
@@ -87,6 +89,7 @@ tasks:
     cmds:
       - |
         helm install flux-operator oci://ghcr.io/controlplaneio-fluxcd/charts/flux-operator \
+        --version $FLUX_OPERATOR_VERSION \
         --namespace flux-system \
         --create-namespace
   create-github-app:

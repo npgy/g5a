@@ -42,5 +42,5 @@ func successPage(privateKeyPath string) []byte {
 		</body>
 
 		</html>
-		`, privateKeyPath)
+		`, html.EscapeString(privateKeyPath))
 }
