@@ -100,6 +100,7 @@ tasks:
     cmds:
       - go run ./cmd/create_gh_app
   bootstrap-github:
+    dotenv: ['github_app_secrets.env']
     cmds:
       - |
         go run ./cmd/retry -n 2 -wait 2s -- 'flux create secret githubapp $GITHUB_APP_SECRET \
