@@ -51,7 +51,7 @@ tasks:
       - "talosctl kubeconfig --nodes $CONTROL_PLANE_IP"
   install-gateway-api:
     cmds:
-      - "go run ./cmd/retry -n 4 -wait 13s -- 'kubectl apply --server-side -f https://github.com/kubernetes-sigs/gateway-api/releases/download/$GATEWAY_API_VERSION/standard-install.yaml'"
+      - "go run ./cmd/retry -n 6 -wait 13s -- 'kubectl apply --server-side -f https://github.com/kubernetes-sigs/gateway-api/releases/download/$GATEWAY_API_VERSION/standard-install.yaml'"
   install-cilium:
     cmds:
       - |
@@ -108,8 +108,6 @@ tasks:
         --app-private-key=$GITHUB_APP_PRIVATE_KEY'
   apply-flux:
     cmds:
-      - cmd: mkdir -p infra/flux/clusters/$CLUSTER_NAME
-      - cmd: mv infra/cluster/base/flux-instance.yaml infra/flux/clusters/$CLUSTER_NAME/
       - cmd: kubectl apply -f infra/flux/clusters/$CLUSTER_NAME/flux-instance.yaml
   connect-github:
     cmds:

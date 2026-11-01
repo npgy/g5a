@@ -5,7 +5,7 @@ metadata:
   namespace: flux-system
 spec:
   distribution:
-    version: "{{ env "FLUX_VERSION" }}""
+    version: "{{ env "FLUX_VERSION" }}"
     registry: "ghcr.io/fluxcd"
   components:
     - source-controller

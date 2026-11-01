@@ -18,8 +18,8 @@ var githubAppState GitHubAppState
 
 func main() {
 	if err := run(); err != nil {
-		fmt.Println(err)
-		return
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
 	}
 }
 
